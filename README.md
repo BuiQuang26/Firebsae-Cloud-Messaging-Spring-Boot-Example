@@ -78,7 +78,7 @@ $ serve dist/
 </dependency>
 ```
 
-### Firebase Config
+### Firebase Messaging Config
 
 ```java
 @Configuration
