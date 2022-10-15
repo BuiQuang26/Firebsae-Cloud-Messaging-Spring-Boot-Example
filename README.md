@@ -67,3 +67,81 @@ $ serve dist/
 ```
 
 ## Spring Boot Server- Firebase admin
+
+### Firebase Dependency
+
+```xml
+<dependency>
+    <groupId>com.google.firebase</groupId>
+    <artifactId>firebase-admin</artifactId>
+    <version>9.0.0</version>
+</dependency>
+```
+
+### Firebase Config
+
+```java
+@Configuration
+public class FirebaseConfig {
+    @Bean
+    public FirebaseMessaging firebaseMessaging() throws IOException {
+        FileInputStream serviceAccount =
+                new FileInputStream("firebase-adminsdk.json");
+        FirebaseOptions options = new FirebaseOptions.Builder()
+                .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                .build();
+        FirebaseApp firebaseApp = FirebaseApp.initializeApp(options);
+        return FirebaseMessaging.getInstance(firebaseApp);
+    }
+}
+```
+### Send message to topic example
+
+```java
+Message message1 = Message.builder()
+                .putData("title", "Message from Spring")
+                .putData("message", message)
+                .putData("time",LocalDateTime.now().toString())
+                .setTopic(topic)
+                .build();
+
+String res = firebaseMessaging.send(message1);
+```
+
+### Subscribe the client app to a topic
+
+```java
+// These registration tokens come from the client FCM SDKs.
+List<String> registrationTokens = Arrays.asList(
+    "YOUR_REGISTRATION_TOKEN_1",
+    // ...
+    "YOUR_REGISTRATION_TOKEN_n"
+);
+
+// Subscribe the devices corresponding to the registration tokens to the
+// topic.
+TopicManagementResponse response = FirebaseMessaging.getInstance().subscribeToTopic(
+    registrationTokens, topic);
+// See the TopicManagementResponse reference documentation
+// for the contents of response.
+System.out.println(response.getSuccessCount() + " tokens were subscribed successfully");
+```
+
+### Unsubscribed topic
+
+```java
+// These registration tokens come from the client FCM SDKs.
+List<String> registrationTokens = Arrays.asList(
+    "YOUR_REGISTRATION_TOKEN_1",
+    // ...
+    "YOUR_REGISTRATION_TOKEN_n"
+);
+
+// Unsubscribe the devices corresponding to the registration tokens from
+// the topic.
+TopicManagementResponse response = FirebaseMessaging.getInstance().unsubscribeFromTopic(
+    registrationTokens, topic);
+// See the TopicManagementResponse reference documentation
+// for the contents of response.
+System.out.println(response.getSuccessCount() + " tokens were unsubscribed successfully");
+```
