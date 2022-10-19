@@ -78,7 +78,7 @@ $ serve dist/
 </dependency>
 ```
 
-### Firebase Config
+### Firebase Messaging Config
 
 ```java
 @Configuration
@@ -127,7 +127,7 @@ TopicManagementResponse response = FirebaseMessaging.getInstance().subscribeToTo
 System.out.println(response.getSuccessCount() + " tokens were subscribed successfully");
 ```
 
-### Unsubscribed topic
+### Unsubscribed the client app to a topic
 
 ```java
 // These registration tokens come from the client FCM SDKs.
