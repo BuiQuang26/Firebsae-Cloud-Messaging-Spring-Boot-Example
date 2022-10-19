@@ -1,7 +1,8 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
-import { getMessaging, getToken, onMessage } from "firebase/messaging";
+import { getMessaging, getToken } from "firebase/messaging";
 import { firebaseConfig, vapidKey } from "../firebase.config";
+import { getDatabase, ref, set, onValue, update } from "firebase/database";
 
 initializeApp(firebaseConfig);
 
@@ -9,10 +10,10 @@ initializeApp(firebaseConfig);
 const app = initializeApp(firebaseConfig);
 
 //init services
-const db = getFirestore();
+const firestore = getFirestore();
 
 //collection ref
-const collectionRef = collection(db, "users");
+const collectionRef = collection(firestore, "users");
 
 getDocs(collectionRef)
     .then((snapshot) => {
@@ -49,7 +50,48 @@ getToken(messaging, { vapidKey })
         // ...
     });
 
-onMessage(messaging, (payload) => {
-    console.log("Message received. ", payload);
-    // ...
+const database = getDatabase();
+
+const autoSendSpeed = () => {
+    setInterval(() => {
+        set(ref(database, "vehicle/" + form.sn.value), {
+            sn: form.sn.value,
+            speed: Math.random(),
+        })
+            .then(() => {
+                console.log("send speed");
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }, 1000);
+};
+
+//realTime database
+const formUpload = document.getElementById("form-upload");
+const formRead = document.getElementById("form-read");
+
+formUpload.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    let key = formUpload.key.value;
+    let value = formUpload.value.value;
+
+    update(ref(database, formUpload.topic.value + "/" + key), {
+        value,
+    })
+        .then(() => {
+            form.speed.value = null;
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+});
+
+formRead.addEventListener("submit", (e) => {
+    e.preventDefault();
+    onValue(ref(database, "vehicle/cm001"), (snapshot) => {
+        const data = snapshot.val();
+        console.info(data);
+    });
 });
