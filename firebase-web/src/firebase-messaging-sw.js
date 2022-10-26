@@ -6,16 +6,14 @@ import { firebaseConfig } from "../firebase.config";
 initializeApp(firebaseConfig);
 
 const messaging = getMessaging();
-onBackgroundMessage(messaging, (payload) => {
-    console.log("Received background message ", payload);
 
-    // console.log({ ...payload.data });
-    // Customize notification here
-    const notificationTitle = payload.data.title;
-    const notificationOptions = {
-        body: payload.data.message,
-        icon: "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcTbgtDTjjx4rHScP5PpS1KEkUvIS5vQlwFs3QeWbS0NwyUxj_qe",
-    };
+console.log(self);
 
-    self.registration.showNotification(notificationTitle, notificationOptions);
-});
+// onBackgroundMessage(messaging, (payload) => {
+//     console.log("Received background message ", payload);
+
+//     const data = payload.data;
+// });
+
+// console.log("-----------------------");
+// console.log(self.registration);

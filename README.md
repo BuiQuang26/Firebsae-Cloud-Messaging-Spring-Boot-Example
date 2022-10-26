@@ -53,9 +53,11 @@ module.exports = {
 > get vapidKey: firebase console > Project settings > cloud messaging > generate Key pair
 
 ### Build Web App by WebPack
+
 ```shell
 $ npm run build
 ```
+
 ### Run WebApp
 
 ```sheel
@@ -95,17 +97,27 @@ public class FirebaseConfig {
     }
 }
 ```
-### Send message to topic example
+
+### Send notification example `java`
+
+```java
+Message message = Message.builder()
+                .setNotification(Notification.builder().setTitle(title).setBody(content).build())
+                .setToken(device_token)
+                .build();
+        return FirebaseMessaging.getInstance().send(message1);
+```
+
+### Send message example `java`
 
 ```java
 Message message1 = Message.builder()
-                .putData("title", "Message from Spring")
                 .putData("message", message)
                 .putData("time",LocalDateTime.now().toString())
-                .setTopic(topic)
+                .setToken(device_token)
                 .build();
 
-String res = firebaseMessaging.send(message1);
+return FirebaseMessaging.getInstance().send(message1);
 ```
 
 ### Subscribe the client app to a topic

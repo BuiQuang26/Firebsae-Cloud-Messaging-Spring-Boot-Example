@@ -1,30 +1,11 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs } from "firebase/firestore";
-import { getMessaging, getToken } from "firebase/messaging";
+import { getMessaging, getToken, onMessage } from "firebase/messaging";
 import { firebaseConfig, vapidKey } from "../firebase.config";
-import { getDatabase, ref, set, onValue, update } from "firebase/database";
 
 initializeApp(firebaseConfig);
 
 //init firebase app
 const app = initializeApp(firebaseConfig);
-
-//init services
-const firestore = getFirestore();
-
-//collection ref
-const collectionRef = collection(firestore, "users");
-
-getDocs(collectionRef)
-    .then((snapshot) => {
-        const docs = snapshot.docs;
-        docs.forEach((doc) => {
-            console.log({ ...doc.data(), userId: doc.id });
-        });
-    })
-    .catch((error) => {
-        console.log(error);
-    });
 
 // FCM
 // Get registration token. Initially this makes a network call, once retrieved
@@ -36,7 +17,7 @@ getToken(messaging, { vapidKey })
         if (currentToken) {
             // Send the token to your server and update the UI if necessary
             // ...
-            console.log(currentToken);
+            console.log({ currentToken });
         } else {
             // Show permission request UI
             console.log(
@@ -50,48 +31,35 @@ getToken(messaging, { vapidKey })
         // ...
     });
 
-const database = getDatabase();
+//handle form submit
+const formSendMessage = document.getElementById("form-send-message");
+const formSendNoti = document.getElementById("form-send-noti");
 
-const autoSendSpeed = () => {
-    setInterval(() => {
-        set(ref(database, "vehicle/" + form.sn.value), {
-            sn: form.sn.value,
-            speed: Math.random(),
-        })
-            .then(() => {
-                console.log("send speed");
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-    }, 1000);
-};
-
-//realTime database
-const formUpload = document.getElementById("form-upload");
-const formRead = document.getElementById("form-read");
-
-formUpload.addEventListener("submit", (e) => {
+formSendMessage.addEventListener("submit", (e) => {
     e.preventDefault();
 
-    let key = formUpload.key.value;
-    let value = formUpload.value.value;
+    const messageData = {
+        "device token": formSendMessage.device_token.value,
+        mesage: formSendMessage.message.value,
+    };
 
-    update(ref(database, formUpload.topic.value + "/" + key), {
-        value,
-    })
-        .then(() => {
-            form.speed.value = null;
-        })
-        .catch((error) => {
-            console.log(error);
-        });
+    console.log(messageData);
+
+    messaging;
 });
 
-formRead.addEventListener("submit", (e) => {
+formSendNoti.addEventListener("submit", (e) => {
     e.preventDefault();
-    onValue(ref(database, "vehicle/cm001"), (snapshot) => {
-        const data = snapshot.val();
-        console.info(data);
-    });
+
+    const notiData = {
+        device_token: formSendNoti.device_token.value,
+        title: formSendNoti.noti_title.value,
+        content: formSendNoti.noti_content.value,
+    };
+
+    console.log(notiData);
+});
+
+onMessage(messaging, (payload) => {
+    console.log(payload);
 });
